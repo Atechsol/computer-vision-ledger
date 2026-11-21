@@ -8,6 +8,7 @@ from . import db
 from .face import FaceEngine
 
 MAX_DETECT_SIDE = 1600
+DETECT_SIDES = (640, 480, 960, 320)  # longest side, tried in this order
 MAX_STORED_SIDE = 800
 
 
@@ -24,10 +25,32 @@ def _fit(img: np.ndarray, max_side: int) -> np.ndarray:
     return cv2.resize(img, (int(w * s), int(h * s)), interpolation=cv2.INTER_AREA) if s < 1 else img
 
 
+def _detect_multiscale(engine: FaceEngine, img: np.ndarray) -> np.ndarray:
+    """Detect at several sizes and return faces in `img` coordinates.
+
+    YuNet loses confidence on very large faces (typical of phone selfies at
+    full resolution), so a face that is missed at one size is often found at
+    another. Try the sizes it handles best first and stop at the first hit.
+    """
+    seen = set()
+    for side in DETECT_SIDES:
+        small = _fit(img, side)
+        if small.shape[:2] in seen:
+            continue
+        seen.add(small.shape[:2])
+        faces = engine.detect(small)
+        if len(faces):
+            scale = small.shape[1] / img.shape[1]
+            faces = faces.copy()
+            faces[:, :14] /= scale
+            return faces
+    return np.zeros((0, 15), dtype=np.float32)
+
+
 def embed_photo(engine: FaceEngine, data: bytes) -> tuple[np.ndarray, np.ndarray]:
     """Return (embedding, image) for the single face in the photo, or raise ValueError."""
     img = _fit(_decode(data), MAX_DETECT_SIDE)
-    faces = engine.detect(img)
+    faces = _detect_multiscale(engine, img)
     if len(faces) == 0:
         raise ValueError("no face found")
     areas = faces[:, 2] * faces[:, 3]
