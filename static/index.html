@@ -4,60 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Credit Watchlist</title>
-<style>
-  :root { --bg:#f4f5f7; --card:#fff; --ink:#1c1f26; --muted:#6b7280; --line:#e4e6eb;
-          --red:#d93025; --green:#188038; --amber:#b06000; --blue:#1a56db; }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg:#14161a; --card:#1d2026; --ink:#e8eaed; --muted:#9aa0a6; --line:#2e3239;
-            --red:#f28b82; --green:#81c995; --amber:#fdd663; --blue:#8ab4f8; }
-  }
-  * { box-sizing:border-box; }
-  body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.45 -apple-system,system-ui,sans-serif; }
-  header { display:flex; align-items:center; gap:12px; padding:12px 20px; }
-  header h1 { font-size:18px; margin:0; flex:1; }
-  .pill { padding:2px 10px; border-radius:99px; font-size:12px; border:1px solid var(--line); background:var(--card); }
-  .pill.ok { color:var(--green); } .pill.bad { color:var(--red); }
-  .settings { display:flex; flex-wrap:wrap; gap:14px; align-items:end; margin:0 20px 14px; padding:10px 14px;
-              background:var(--card); border:1px solid var(--line); border-radius:10px; }
-  .settings label { display:flex; flex-direction:column; font-size:12px; color:var(--muted); gap:2px; }
-  .settings input { width:100px; }
-  main { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:16px; padding:0 20px 24px; }
-  @media (max-width:900px) { main { grid-template-columns:1fr; } }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px; }
-  .card h2 { font-size:14px; margin:0 0 8px; }
-  #video { width:100%; border-radius:8px; background:#000; display:block; aspect-ratio:16/9; object-fit:contain; }
-  table { width:100%; border-collapse:collapse; }
-  th, td { text-align:left; padding:7px 6px; border-bottom:1px solid var(--line); vertical-align:middle; }
-  th { font-size:12px; color:var(--muted); font-weight:500; }
-  td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
-  .thumb { width:34px; height:34px; border-radius:50%; object-fit:cover; background:var(--line); vertical-align:middle; margin-right:8px; }
-  .tag { font-size:11px; padding:1px 8px; border-radius:99px; border:1px solid currentColor; white-space:nowrap; }
-  .tag.watch { color:var(--red); } .tag.clear { color:var(--green); } .tag.noface { color:var(--amber); }
-  button { font:inherit; padding:5px 10px; border-radius:7px; border:1px solid var(--line); background:var(--card);
-           color:var(--ink); cursor:pointer; }
-  button:hover { border-color:var(--blue); }
-  button.primary { background:var(--blue); color:#fff; border-color:var(--blue); }
-  button.danger { color:var(--red); }
-  .row-actions { display:flex; gap:4px; flex-wrap:wrap; justify-content:flex-end; }
-  .toolbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
-  dialog { border:1px solid var(--line); border-radius:12px; background:var(--card); color:var(--ink); padding:18px; max-width:92vw; }
-  dialog::backdrop { background:rgba(0,0,0,.5); }
-  dialog form { display:flex; flex-direction:column; gap:10px; min-width:300px; }
-  dialog label { display:flex; flex-direction:column; gap:3px; font-size:12px; color:var(--muted); }
-  input, select { font:inherit; padding:6px 8px; border:1px solid var(--line); border-radius:7px; background:var(--bg); color:var(--ink); }
-  .actions { display:flex; gap:8px; justify-content:flex-end; margin-top:4px; }
-  .msg { font-size:12px; color:var(--amber); white-space:pre-line; }
-  #alertDlg { border:3px solid var(--red); width:640px; }
-  #alertDlg h2 { color:var(--red); margin:0 0 4px; font-size:20px; }
-  .faces { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:10px 0; }
-  .faces figure { margin:0; } .faces img { width:100%; border-radius:8px; background:var(--line); aspect-ratio:4/3; object-fit:cover; }
-  .faces figcaption { font-size:12px; color:var(--muted); text-align:center; margin-top:2px; }
-  .due { font-size:30px; font-weight:700; color:var(--red); }
-  .bigbtn { width:100%; padding:12px; font-size:16px; }
-  .empty { color:var(--muted); padding:14px 0; text-align:center; }
-</style>
+<link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+<div class="wrap">
 <header>
   <h1>Credit Watchlist</h1>
   <span id="camPill" class="pill">camera…</span>
@@ -68,10 +18,9 @@
   <label>Min due (₹)<input type="number" name="min_due" min="0" step="100"></label>
   <label>Match threshold<input type="number" name="threshold" min="0" max="1" step="0.01"></label>
   <label>Cooldown (s)<input type="number" name="cooldown" min="0" step="5"></label>
-  <label>Confirm N<input type="number" name="confirm_n" min="1" max="20" style="width:60px"></label>
-  <label>of last M frames<input type="number" name="confirm_m" min="1" max="20" style="width:60px"></label>
-  <button class="primary" type="submit">Save</button>
-  <span id="settingsMsg" class="msg"></span>
+  <label>Confirm N<input type="number" name="confirm_n" min="1" max="20"></label>
+  <label>of last M frames<input type="number" name="confirm_m" min="1" max="20"></label>
+  <div class="save"><button class="primary" type="submit">Save</button><span id="settingsMsg" class="msg"></span></div>
 </form>
 
 <main>
@@ -79,30 +28,33 @@
     <div class="card">
       <h2>Live camera</h2>
       <img id="video" src="/video" alt="Live camera feed">
-      <p class="msg" style="color:var(--muted);margin:8px 0 0">
+      <p class="hint">
         Box colours: <b style="color:var(--red)">red</b> = enrolled &amp; owes,
         <b style="color:var(--green)">green</b> = enrolled, no dues, <b>grey</b> = unknown.
       </p>
     </div>
-    <div class="card" style="margin-top:16px">
+    <div class="card">
       <h2>Recent alerts</h2>
-      <table><tbody id="alertRows"></tbody></table>
+      <div class="tablewrap"><table><tbody id="alertRows"></tbody></table></div>
       <div id="alertEmpty" class="empty">No alerts yet</div>
     </div>
   </section>
 
   <section class="card">
     <div class="toolbar">
-      <h2 style="margin:0">Buyers</h2>
+      <h2>Buyers</h2>
       <button class="primary" id="addBuyerBtn">+ Add buyer</button>
     </div>
-    <table>
-      <thead><tr><th>Name</th><th class="num">Outstanding</th><th>Status</th><th></th></tr></thead>
-      <tbody id="buyerRows"></tbody>
-    </table>
+    <div class="tablewrap">
+      <table id="buyersTable">
+        <thead><tr><th>Name</th><th class="num">Outstanding</th><th>Status</th><th></th></tr></thead>
+        <tbody id="buyerRows"></tbody>
+      </table>
+    </div>
     <div id="buyerEmpty" class="empty">No buyers yet — add one with a photo</div>
   </section>
 </main>
+</div>
 
 <!-- Add buyer -->
 <dialog id="addDlg">
@@ -144,9 +96,9 @@
 <!-- Alert notification -->
 <dialog id="alertDlg">
   <h2>⚠ Credit buyer detected</h2>
-  <div style="font-size:18px;font-weight:600" id="aName"></div>
+  <div class="who" id="aName"></div>
   <div class="due" id="aDue"></div>
-  <div class="msg" style="color:var(--muted)" id="aMeta"></div>
+  <div class="sub" id="aMeta"></div>
   <div class="faces">
     <figure><img id="aEnrolled" alt="Enrolled photo"><figcaption>Enrolled photo</figcaption></figure>
     <figure><img id="aSnap" alt="Camera snapshot"><figcaption>Camera snapshot</figcaption></figure>
@@ -218,15 +170,15 @@ async function loadBuyers() {
     const nameCell = el("td", {});
     if (b.photo_path) nameCell.append(el("img", { class: "thumb", src: photoUrl(b.photo_path), alt: "" }));
     nameCell.append(b.name);
-    if (b.phone) nameCell.append(el("div", { style: "font-size:11px;color:var(--muted);margin-left:42px" }, b.phone));
+    if (b.phone) nameCell.append(el("div", { class: "sub", style: "margin-left:46px" }, b.phone));
     rows.append(el("tr", {},
       nameCell,
       el("td", { class: "num" }, inr.format(b.outstanding)),
       el("td", {}, status),
       el("td", {}, el("div", { class: "row-actions" },
-        el("button", { onclick: () => openEnroll(b) }, "Enroll"),
-        el("button", { onclick: () => openLedger(b) }, "Ledger"),
-        el("button", { class: "danger", title: "Delete buyer and face data", onclick: () => delBuyer(b) }, "✕")))));
+        el("button", { class: "sm", onclick: () => openEnroll(b) }, "Enroll"),
+        el("button", { class: "sm", onclick: () => openLedger(b) }, "Ledger"),
+        el("button", { class: "sm danger", title: "Delete buyer and face data", onclick: () => delBuyer(b) }, "✕")))));
   }
 }
 
@@ -289,7 +241,7 @@ async function loadAlerts() {
       el("td", {}, a.name),
       el("td", { class: "num" }, inr.format(a.outstanding)),
       el("td", {}, fmtTime(a.ts)),
-      el("td", {}, a.acknowledged ? el("span", { class: "tag clear" }, "handled") : el("button", { onclick: () => showAlert(a) }, "Review"))));
+      el("td", {}, a.acknowledged ? el("span", { class: "tag clear" }, "handled") : el("button", { class: "sm", onclick: () => showAlert(a) }, "Review"))));
   }
 }
 
