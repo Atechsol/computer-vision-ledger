@@ -61,7 +61,7 @@ Everything runs locally: no cloud calls, no Docker, no external services after t
 | `app/enroll.py` | Photo → validated embedding(s) → storage. |
 | `app/db.py` | Schema, queries, settings cache, embedding-version counter. |
 | `app/main.py` | FastAPI app, MJPEG stream, WebSocket hub, lifecycle. |
-| `static/` | Single-page dashboard (HTML, CSS, vanilla JS; no build step). |
+| `static/` | One HTML page with a sidebar and four hash-routed views (Dashboard, Register buyer, Buyers, Settings). Vanilla JS, no build step. The MJPEG stream is only connected while the Dashboard view is visible. |
 
 ## Runtime model
 
@@ -223,7 +223,7 @@ Optional demo data:
 
 ### Suggested 3-minute demo
 
-1. Add "Demo Merchant" with ₹25,000 opening credit and upload a clear photo of your face.
+1. Open **Register buyer**, add "Demo Merchant" with ₹25,000 due and upload a clear photo of your face.
 2. Step out of frame and back in. An alert modal appears with the enrolled photo, the snapshot and the amount.
 3. Record a ₹25,000 payment in *Ledger*. Walk in again: no alert.
 4. Have a colleague walk in: unknown, no alert.

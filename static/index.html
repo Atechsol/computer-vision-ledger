@@ -7,73 +7,129 @@
 <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-<div class="wrap">
-<header>
-  <h1>Credit Watchlist</h1>
-  <span id="camPill" class="pill">camera…</span>
-  <span id="wsPill" class="pill">live…</span>
-</header>
+<div class="shell">
 
-<form class="settings" id="settingsForm">
-  <label>Min due (₹)<input type="number" name="min_due" min="0" step="100"></label>
-  <label>Match threshold<input type="number" name="threshold" min="0" max="1" step="0.01"></label>
-  <label>Cooldown (s)<input type="number" name="cooldown" min="0" step="5"></label>
-  <label>Confirm N<input type="number" name="confirm_n" min="1" max="20"></label>
-  <label>of last M frames<input type="number" name="confirm_m" min="1" max="20"></label>
-  <div class="save"><button class="primary" type="submit">Save</button><span id="settingsMsg" class="msg"></span></div>
-</form>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      </div>
+      <span>Credit Watchlist</span>
+    </div>
+    <nav class="nav">
+      <a href="#/dashboard" data-route="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+        <span>Dashboard</span><b class="badge" id="navBadge" hidden>0</b>
+      </a>
+      <a href="#/register" data-route="register">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-7 7-7s7 3 7 7"/><path d="M19 8v6M16 11h6"/></svg>
+        <span>Register buyer</span>
+      </a>
+      <a href="#/buyers" data-route="buyers">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Buyers</span>
+      </a>
+      <a href="#/settings" data-route="settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+        <span>Settings</span>
+      </a>
+    </nav>
+    <div class="side-foot">
+      <span id="camPill" class="pill">camera…</span>
+      <span id="wsPill" class="pill">live…</span>
+    </div>
+  </aside>
 
-<main>
-  <section>
-    <div class="card">
-      <h2>Live camera</h2>
-      <img id="video" src="/video" alt="Live camera feed">
-      <p class="hint">
-        Box colours: <b style="color:var(--red)">red</b> = enrolled &amp; owes,
-        <b style="color:var(--green)">green</b> = enrolled, no dues, <b>grey</b> = unknown.
-      </p>
-    </div>
-    <div class="card">
-      <h2>Recent alerts</h2>
-      <div class="tablewrap"><table><tbody id="alertRows"></tbody></table></div>
-      <div id="alertEmpty" class="empty">No alerts yet</div>
-    </div>
-  </section>
+  <div class="content">
 
-  <section class="card">
-    <div class="toolbar">
-      <h2>Buyers</h2>
-      <button class="primary" id="addBuyerBtn">+ Add buyer</button>
-    </div>
-    <div class="tablewrap">
-      <table id="buyersTable">
-        <thead><tr><th>Name</th><th class="num">Outstanding</th><th>Status</th><th></th></tr></thead>
-        <tbody id="buyerRows"></tbody>
-      </table>
-    </div>
-    <div id="buyerEmpty" class="empty">No buyers yet — add one with a photo</div>
-  </section>
-</main>
+    <!-- ===== Dashboard ===== -->
+    <section class="view" data-view="dashboard">
+      <div class="page-head"><h1>Dashboard</h1><p>Live camera feed and credit alerts.</p></div>
+
+      <div class="stats">
+        <div class="card stat"><div class="label">Buyers on watchlist</div><div class="value" id="stWatch">0</div></div>
+        <div class="card stat"><div class="label">Total due (watchlist)</div><div class="value red" id="stDue">₹0</div></div>
+        <div class="card stat"><div class="label">Alerts to review</div><div class="value" id="stPending">0</div></div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="card">
+          <div class="card-head"><h2>Live camera</h2></div>
+          <img id="video" alt="Live camera feed">
+          <p class="hint">
+            Box colours: <b style="color:var(--red)">red</b> = enrolled &amp; owes,
+            <b style="color:var(--green)">green</b> = enrolled, no dues, <b>grey</b> = unknown.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h2>Alerts</h2></div>
+          <div class="tablewrap">
+            <table>
+              <thead><tr><th>Buyer</th><th class="num">Due</th><th></th></tr></thead>
+              <tbody id="alertRows"></tbody>
+            </table>
+          </div>
+          <div id="alertEmpty" class="empty">No alerts yet</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Register buyer ===== -->
+    <section class="view" data-view="register" hidden>
+      <div class="page-head"><h1>Register buyer</h1><p>Add a credit buyer with a face photo and what they owe. The live camera then watches for them.</p></div>
+      <form class="card form narrow" id="registerForm">
+        <label>Name<input name="name" required maxlength="100" autocomplete="off"></label>
+        <div class="row2">
+          <label>Phone (optional)<input name="phone" maxlength="30" inputmode="tel" autocomplete="off"></label>
+          <label>Amount due (₹)<input name="opening_credit" type="number" min="0" step="1" value="0" inputmode="numeric"></label>
+        </div>
+        <label>Face photo(s) — clear, front-facing, one person per photo
+          <input name="photos" type="file" accept="image/*" multiple required></label>
+        <div class="previews" id="previews"></div>
+        <div class="msg" id="regMsg"></div>
+        <div class="actions"><button class="primary" type="submit" id="regBtn">Register &amp; enroll face</button></div>
+      </form>
+    </section>
+
+    <!-- ===== Buyers ===== -->
+    <section class="view" data-view="buyers" hidden>
+      <div class="page-head"><h1>Buyers</h1><p>Everyone enrolled, with their outstanding balance.</p></div>
+      <div class="card">
+        <div class="card-head"><h2>All buyers</h2><button class="primary sm" type="button" onclick="location.hash='#/register'">+ Register buyer</button></div>
+        <div class="tablewrap">
+          <table id="buyersTable">
+            <thead><tr><th>Name</th><th class="num">Outstanding</th><th>Status</th><th></th></tr></thead>
+            <tbody id="buyerRows"></tbody>
+          </table>
+        </div>
+        <div id="buyerEmpty" class="empty">No buyers yet — register one with a photo</div>
+      </div>
+    </section>
+
+    <!-- ===== Settings ===== -->
+    <section class="view" data-view="settings" hidden>
+      <div class="page-head"><h1>Settings</h1><p>Tune when an alert fires. Changes apply immediately.</p></div>
+      <form class="card form narrow" id="settingsForm">
+        <div class="fields">
+          <label>Minimum due (₹)<input type="number" name="min_due" min="0" step="100"></label>
+          <label>Match threshold (0–1)<input type="number" name="threshold" min="0" max="1" step="0.01"></label>
+          <label>Cooldown (seconds)<input type="number" name="cooldown" min="0" step="5"></label>
+          <label>Confirm in N frames<input type="number" name="confirm_n" min="1" max="20"></label>
+          <label>…out of last M frames<input type="number" name="confirm_m" min="1" max="20"></label>
+        </div>
+        <p class="hint" style="margin:0">Lower the threshold if known faces are missed; raise it if strangers match. Higher N makes alerts slower but steadier.</p>
+        <div class="actions"><span id="settingsMsg" class="msg" style="align-self:center"></span><button class="primary" type="submit">Save settings</button></div>
+      </form>
+    </section>
+
+  </div>
 </div>
-
-<!-- Add buyer -->
-<dialog id="addDlg">
-  <form id="addForm" method="dialog">
-    <h2 style="margin:0">Add buyer</h2>
-    <label>Name<input name="name" required maxlength="100"></label>
-    <label>Phone (optional)<input name="phone" maxlength="30"></label>
-    <label>Opening credit (₹)<input name="opening_credit" type="number" min="0" step="1" value="0"></label>
-    <label>Face photo(s) — clear, front-facing, one person per photo
-      <input name="photos" type="file" accept="image/*" multiple required></label>
-    <div class="msg" id="addMsg"></div>
-    <div class="actions"><button type="button" data-close>Cancel</button><button class="primary" type="submit">Add &amp; enroll</button></div>
-  </form>
-</dialog>
 
 <!-- Enroll more photos -->
 <dialog id="enrollDlg">
   <form id="enrollForm" method="dialog">
-    <h2 style="margin:0" id="enrollTitle">Enroll photos</h2>
+    <h2 id="enrollTitle">Enroll photos</h2>
     <label>More photos (different angle / glasses on or off help)
       <input name="photos" type="file" accept="image/*" multiple required></label>
     <div class="msg" id="enrollMsg"></div>
@@ -84,7 +140,7 @@
 <!-- Ledger entry -->
 <dialog id="ledgerDlg">
   <form id="ledgerForm" method="dialog">
-    <h2 style="margin:0" id="ledgerTitle">Ledger entry</h2>
+    <h2 id="ledgerTitle">Ledger entry</h2>
     <label>Type<select name="kind"><option value="payment">Payment received</option><option value="credit">Credit given</option></select></label>
     <label>Amount (₹)<input name="amount" type="number" min="1" step="1" required></label>
     <label>Note (optional)<input name="note" maxlength="200"></label>
@@ -111,7 +167,7 @@ const $ = (s) => document.querySelector(s);
 const inr = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
 const fmtTime = (ts) => new Date(ts * 1000).toLocaleString();
 const photoUrl = (p) => (p ? "/photos/" + p : "");
-let settings = {}, buyers = [];
+let settings = {}, buyers = [], alertList = [];
 
 function el(tag, attrs = {}, ...kids) {
   const e = document.createElement(tag);
@@ -122,6 +178,12 @@ function el(tag, attrs = {}, ...kids) {
   }
   for (const kid of kids) e.append(kid);
   return e;
+}
+function who(name, photo, sub) {
+  const box = el("div", {});
+  box.append(name);
+  if (sub) box.append(el("div", { class: "sub" }, sub));
+  return el("div", { class: "who-cell" }, photo ? el("img", { class: "thumb", src: photoUrl(photo), alt: "" }) : el("span", { class: "thumb" }), box);
 }
 
 async function api(path, opts = {}) {
@@ -134,12 +196,28 @@ async function api(path, opts = {}) {
   return r.json();
 }
 const postJSON = (path, body) => api(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-
 function filesForm(input) {
   const fd = new FormData();
   for (const f of input.files) fd.append("photos", f);
   return fd;
 }
+
+/* ---------- routing (hash views, one page) ---------- */
+const ROUTES = ["dashboard", "register", "buyers", "settings"];
+function route() {
+  const r = ROUTES.includes(location.hash.slice(2)) ? location.hash.slice(2) : "dashboard";
+  document.querySelectorAll(".view").forEach((v) => (v.hidden = v.dataset.view !== r));
+  document.querySelectorAll(".nav a").forEach((a) => {
+    if (a.dataset.route === r) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+  });
+  // Only pull the MJPEG stream while the dashboard is visible.
+  const v = $("#video");
+  if (r === "dashboard") { if (!v.getAttribute("src")) v.src = "/video"; }
+  else v.removeAttribute("src");
+  document.title = "Credit Watchlist";
+  if (r === "buyers" || r === "dashboard") loadBuyers();
+}
+window.addEventListener("hashchange", route);
 
 /* ---------- dialogs ---------- */
 document.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", () => b.closest("dialog").close()));
@@ -152,9 +230,40 @@ async function loadSettings() {
 $("#settingsForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const body = Object.fromEntries(new FormData(e.target));
-  try { settings = await postJSON("/settings", body); $("#settingsMsg").textContent = "Saved"; loadBuyers(); }
-  catch (err) { $("#settingsMsg").textContent = err.message; }
-  setTimeout(() => ($("#settingsMsg").textContent = ""), 2500);
+  const msg = $("#settingsMsg");
+  try { settings = await postJSON("/settings", body); msg.className = "msg ok"; msg.textContent = "Saved"; loadBuyers(); }
+  catch (err) { msg.className = "msg"; msg.textContent = err.message; }
+  setTimeout(() => (msg.textContent = ""), 2500);
+});
+
+/* ---------- register ---------- */
+$("#registerForm [name=photos]").addEventListener("change", (e) => {
+  const box = $("#previews");
+  box.replaceChildren();
+  for (const f of e.target.files) box.append(el("img", { src: URL.createObjectURL(f), alt: "" }));
+});
+$("#registerForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = e.target, msg = $("#regMsg"), btn = $("#regBtn");
+  btn.disabled = true; msg.className = "msg"; msg.textContent = "Registering…";
+  let buyer;
+  try {
+    buyer = await postJSON("/buyers", { name: f.name.value, phone: f.phone.value, opening_credit: Number(f.opening_credit.value || 0) });
+    const res = await api(`/buyers/${buyer.id}/enroll`, { method: "POST", body: filesForm(f.photos) });
+    if (res.enrolled === 0) {
+      // Roll back so the user can simply retry with a better photo, with no half-registered buyer left behind.
+      await api(`/buyers/${buyer.id}`, { method: "DELETE" }).catch(() => {});
+      msg.textContent = `No usable face found, so nothing was saved:\n${res.errors.join("\n")}`;
+    } else {
+      msg.className = "msg ok";
+      msg.textContent = `✓ ${buyer.name} registered with ${res.enrolled} face photo${res.enrolled > 1 ? "s" : ""}.` + (res.errors.length ? `\nSkipped:\n${res.errors.join("\n")}` : "");
+      f.reset(); $("#previews").replaceChildren();
+      loadBuyers();
+    }
+  } catch (err) {
+    if (buyer) await api(`/buyers/${buyer.id}`, { method: "DELETE" }).catch(() => {});
+    msg.className = "msg"; msg.textContent = err.message;
+  } finally { btn.disabled = false; }
 });
 
 /* ---------- buyers ---------- */
@@ -163,45 +272,27 @@ async function loadBuyers() {
   const rows = $("#buyerRows");
   rows.replaceChildren();
   $("#buyerEmpty").style.display = buyers.length ? "none" : "block";
+  let watchCount = 0, watchDue = 0;
   for (const b of buyers) {
     const watch = b.outstanding > settings.min_due;
+    if (watch) { watchCount++; watchDue += b.outstanding; }
     const status = b.n_embeddings === 0 ? el("span", { class: "tag noface" }, "no face enrolled")
       : watch ? el("span", { class: "tag watch" }, "on watchlist") : el("span", { class: "tag clear" }, "clear");
-    const nameCell = el("td", {});
-    if (b.photo_path) nameCell.append(el("img", { class: "thumb", src: photoUrl(b.photo_path), alt: "" }));
-    nameCell.append(b.name);
-    if (b.phone) nameCell.append(el("div", { class: "sub", style: "margin-left:46px" }, b.phone));
     rows.append(el("tr", {},
-      nameCell,
+      el("td", {}, who(b.name, b.photo_path, b.phone)),
       el("td", { class: "num" }, inr.format(b.outstanding)),
       el("td", {}, status),
       el("td", {}, el("div", { class: "row-actions" },
-        el("button", { class: "sm", onclick: () => openEnroll(b) }, "Enroll"),
+        el("button", { class: "sm", onclick: () => openEnroll(b) }, "Add photos"),
         el("button", { class: "sm", onclick: () => openLedger(b) }, "Ledger"),
         el("button", { class: "sm danger", title: "Delete buyer and face data", onclick: () => delBuyer(b) }, "✕")))));
   }
+  $("#stWatch").textContent = watchCount;
+  $("#stDue").textContent = inr.format(watchDue);
 }
 
-$("#addBuyerBtn").addEventListener("click", () => { $("#addForm").reset(); $("#addMsg").textContent = ""; $("#addDlg").showModal(); });
-$("#addForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const f = e.target, msg = $("#addMsg");
-  msg.textContent = "Saving…";
-  let buyer;
-  try {
-    buyer = await postJSON("/buyers", { name: f.name.value, phone: f.phone.value, opening_credit: Number(f.opening_credit.value || 0) });
-    const res = await api(`/buyers/${buyer.id}/enroll`, { method: "POST", body: filesForm(f.photos) });
-    if (res.enrolled === 0) {
-      msg.textContent = `Buyer saved, but no usable face:\n${res.errors.join("\n")}\nUse "Enroll" on the row to try another photo.`;
-      loadBuyers(); return;
-    }
-    $("#addDlg").close();
-  } catch (err) { msg.textContent = err.message; if (buyer) loadBuyers(); return; }
-  loadBuyers();
-});
-
 let enrollTarget = null;
-function openEnroll(b) { enrollTarget = b; $("#enrollTitle").textContent = "Enroll photos — " + b.name; $("#enrollForm").reset(); $("#enrollMsg").textContent = ""; $("#enrollDlg").showModal(); }
+function openEnroll(b) { enrollTarget = b; $("#enrollTitle").textContent = "Add photos — " + b.name; $("#enrollForm").reset(); $("#enrollMsg").textContent = ""; $("#enrollDlg").showModal(); }
 $("#enrollForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   $("#enrollMsg").textContent = "Processing…";
@@ -232,17 +323,20 @@ async function delBuyer(b) {
 
 /* ---------- alerts ---------- */
 async function loadAlerts() {
-  const list = await api("/alerts?limit=15");
+  alertList = await api("/alerts?limit=30");
   const rows = $("#alertRows");
   rows.replaceChildren();
-  $("#alertEmpty").style.display = list.length ? "none" : "block";
-  for (const a of list) {
+  $("#alertEmpty").style.display = alertList.length ? "none" : "block";
+  for (const a of alertList) {
     rows.append(el("tr", {},
-      el("td", {}, a.name),
+      el("td", {}, who(a.name, a.photo_path, fmtTime(a.ts))),
       el("td", { class: "num" }, inr.format(a.outstanding)),
-      el("td", {}, fmtTime(a.ts)),
-      el("td", {}, a.acknowledged ? el("span", { class: "tag clear" }, "handled") : el("button", { class: "sm", onclick: () => showAlert(a) }, "Review"))));
+      el("td", { class: "num" }, a.acknowledged ? el("span", { class: "tag clear" }, "handled") : el("button", { class: "sm primary", onclick: () => showAlert(a) }, "Review"))));
   }
+  const pending = alertList.filter((a) => !a.acknowledged).length;
+  $("#stPending").textContent = pending;
+  const badge = $("#navBadge");
+  badge.textContent = pending; badge.hidden = pending === 0;
 }
 
 const queue = [];
@@ -271,16 +365,16 @@ $("#alertDlg").addEventListener("cancel", (e) => e.preventDefault()); // must ac
 /* ---------- live socket + status ---------- */
 function connectWS() {
   const ws = new WebSocket((location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/ws");
-  ws.onopen = () => { $("#wsPill").textContent = "live ✓"; $("#wsPill").className = "pill ok"; };
+  ws.onopen = () => { $("#wsPill").textContent = "live"; $("#wsPill").className = "pill ok"; };
   ws.onmessage = (m) => { const d = JSON.parse(m.data); if (d.type === "alert") { showAlert(d.alert); loadAlerts(); } };
-  ws.onclose = () => { $("#wsPill").textContent = "reconnecting…"; $("#wsPill").className = "pill bad"; setTimeout(connectWS, 1500); };
+  ws.onclose = () => { $("#wsPill").textContent = "reconnecting"; $("#wsPill").className = "pill bad"; setTimeout(connectWS, 1500); };
   const t = setInterval(() => { if (ws.readyState === 1) ws.send("ping"); else clearInterval(t); }, 20000);
 }
 
 async function pollStatus() {
   try {
     const s = await api("/status");
-    $("#camPill").textContent = s.camera ? `camera ✓ ${s.fps} fps` : "camera unavailable";
+    $("#camPill").textContent = s.camera ? "camera on" : "camera off";
     $("#camPill").className = "pill " + (s.camera ? "ok" : "bad");
   } catch { $("#camPill").textContent = "server offline"; $("#camPill").className = "pill bad"; }
 }
@@ -288,6 +382,7 @@ async function pollStatus() {
 (async () => {
   await loadSettings();
   await Promise.all([loadBuyers(), loadAlerts()]);
+  route();
   (await api("/alerts?unacked=true&limit=20")).reverse().forEach(showAlert); // pending from before reload
   connectWS();
   pollStatus();
